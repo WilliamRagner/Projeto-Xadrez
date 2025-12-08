@@ -1,10 +1,18 @@
 package br.com.xadrez.modelo;
 
 public class Torre extends Peca {
-
+    private int movimentos;
     public Torre(Cor cor) {
         super(cor);
+        this.movimentos = 0;
     }
+    public void incrementaMovimentos() {
+        movimentos++;
+    }
+    public int getMovimentos() {
+        return movimentos;
+    }
+
 
     @Override
     public String getSimbolo() {

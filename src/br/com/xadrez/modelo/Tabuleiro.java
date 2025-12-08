@@ -5,7 +5,8 @@ public class Tabuleiro {
     private final Peca[][] casas = new Peca[8][8];
     private Cor turno;
     private java.util.List<Peca> pecasCapturadas;
-
+    private Peao peaoVulneravelEnPassant;
+    private Peca promocao;
 
     public Tabuleiro() {
         this.turno = Cor.BRANCA;
@@ -16,8 +17,23 @@ public class Tabuleiro {
         return turno;
     }
 
+    public Peca getPromocao() {
+        return promocao;
+    }
+
+    public Peao getPeaoVulneravelEnPassant() {
+        return peaoVulneravelEnPassant;
+    }
+    public void promoverPeca(Peca peca) {
+        casas[promocao.getPosicao().getLinha()][promocao.getPosicao().getColuna()] = peca;
+        peca.setPosicao(promocao.getPosicao());
+        peca.setTabuleiro(this);
+        promocao = null;
+        proximoTurno();
+    }
     private void proximoTurno() {
         turno = (turno == Cor.BRANCA) ? Cor.PRETA : Cor.BRANCA;
+        peaoVulneravelEnPassant = null;
     }
 
 
@@ -57,8 +73,11 @@ public class Tabuleiro {
 
     public void moverPeca(Posicao da, Posicao para) {
         Peca peca = getPeca(da);
+        if (peca == null) {
+            return;
+        }
         if (peca.movimentosPossiveis()[para.getLinha()][para.getColuna()]) {
-            
+
             Peca pecaCapturada = fazerMovimentoTemporario(da, para);
             boolean emXeque = estaEmXeque(peca.getCor());
             desfazerMovimento(da, para, pecaCapturada);
@@ -71,12 +90,56 @@ public class Tabuleiro {
             if (pecaCapturada != null) {
                 pecasCapturadas.add(pecaCapturada);
             }
+
+            // En Passant
+            if (peca instanceof Peao && da.getColuna() != para.getColuna() && pecaCapturada == null) {
+                int direcao = peca.getCor() == Cor.BRANCA ? 1 : -1;
+                pecaCapturada = getPeca(para.getLinha() + direcao, para.getColuna());
+                casas[para.getLinha() + direcao][para.getColuna()] = null;
+                pecasCapturadas.add(pecaCapturada);
+            }
+
             casas[da.getLinha()][da.getColuna()] = null;
             casas[para.getLinha()][para.getColuna()] = peca;
             peca.setPosicao(para);
+
             if (peca instanceof Peao) {
                 ((Peao) peca).incrementaMovimentos();
+                if (Math.abs(da.getLinha() - para.getLinha()) == 2) {
+                    peaoVulneravelEnPassant = (Peao) peca;
+                } else {
+                    peaoVulneravelEnPassant = null;
+                }
+                if (para.getLinha() == 0 || para.getLinha() == 7) {
+                    promocao = peca;
+                    return;
+                }
+
+            } else {
+                peaoVulneravelEnPassant = null;
             }
+            if (peca instanceof Rei) {
+                ((Rei) peca).incrementaMovimentos();
+                // roque
+                if (Math.abs(da.getColuna() - para.getColuna()) == 2) {
+                    if (para.getColuna() == 6) {
+                        Peca torre = getPeca(new Posicao(da.getLinha(), 7));
+                        casas[da.getLinha()][7] = null;
+                        casas[da.getLinha()][5] = torre;
+                        torre.setPosicao(new Posicao(da.getLinha(), 5));
+                    } else {
+                        Peca torre = getPeca(new Posicao(da.getLinha(), 0));
+                        casas[da.getLinha()][0] = null;
+                        casas[da.getLinha()][3] = torre;
+                        torre.setPosicao(new Posicao(da.getLinha(), 3));
+                    }
+                }
+            }
+            if (peca instanceof Torre) {
+                ((Torre) peca).incrementaMovimentos();
+            }
+
+            promocao = null;
             proximoTurno();
         }
     }
