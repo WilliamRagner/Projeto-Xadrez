@@ -53,6 +53,20 @@ public class Peao extends Peca {
             matrizMovimentos[p.getLinha()][p.getColuna()] = true;
         }
 
+        // En Passant
+        if (getTabuleiro().getPeaoVulneravelEnPassant() != null) {
+            if (posicao.getLinha() == (getCor() == Cor.BRANCA ? 3 : 4)) {
+                Posicao posPeaoVulneravel = getTabuleiro().getPeaoVulneravelEnPassant().getPosicao();
+                if (posPeaoVulneravel.getColuna() == posicao.getColuna() - 1) {
+                    matrizMovimentos[posPeaoVulneravel.getLinha() + direcao][posPeaoVulneravel.getColuna()] = true;
+                }
+                if (posPeaoVulneravel.getColuna() == posicao.getColuna() + 1) {
+                    matrizMovimentos[posPeaoVulneravel.getLinha() + direcao][posPeaoVulneravel.getColuna()] = true;
+                }
+            }
+        }
+
+
         return matrizMovimentos;
     }
 }

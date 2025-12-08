@@ -1,9 +1,13 @@
 package br.com.xadrez.gui;
 
+import br.com.xadrez.modelo.Bispo;
+import br.com.xadrez.modelo.Cavalo;
 import br.com.xadrez.modelo.Cor;
 import br.com.xadrez.modelo.Peca;
 import br.com.xadrez.modelo.Posicao;
+import br.com.xadrez.modelo.Rainha;
 import br.com.xadrez.modelo.Tabuleiro;
+import br.com.xadrez.modelo.Torre;
 import javax.swing.*;
 import java.awt.*;
 
@@ -11,7 +15,7 @@ public class TabuleiroGUI extends JFrame {
 
     private final JPanel painelTabuleiro;
     private final JButton[][] casas = new JButton[8][8];
-    private final Tabuleiro tabuleiro;
+    private Tabuleiro tabuleiro;
     private Peca pecaSelecionada;
     private boolean[][] movimentosPossiveis;
     private Posicao pecaNaPosicao;
@@ -24,6 +28,7 @@ public class TabuleiroGUI extends JFrame {
 
         tabuleiro = new Tabuleiro();
         painelTabuleiro = new JPanel(new GridLayout(8, 8));
+        painelTabuleiro.setPreferredSize(new Dimension(800, 800));
         
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -42,6 +47,18 @@ public class TabuleiroGUI extends JFrame {
                 painelTabuleiro.add(casas[i][j]);
             }
         }
+
+        
+        JMenuBar menuBar = new JMenuBar();
+        JMenu menu = new JMenu("Jogo");
+        JMenuItem reiniciar = new JMenuItem("Começar outra partida");
+        reiniciar.addActionListener(e -> reiniciarJogo());
+        JMenuItem sair = new JMenuItem("Sair do jogo");
+        sair.addActionListener(e -> System.exit(0));
+        menu.add(reiniciar);
+        menu.add(sair);
+        menuBar.add(menu);
+        setJMenuBar(menuBar);
 
         add(painelTabuleiro, new GridBagConstraints());
         
@@ -69,6 +86,10 @@ public class TabuleiroGUI extends JFrame {
                 atualizarTabuleiro();
                 limparHighlights();
 
+                if (tabuleiro.getPromocao() != null) {
+                    promoverPeao();
+                }
+
                 if (tabuleiro.estaEmXequeMate(tabuleiro.getTurno())) {
                     JOptionPane.showMessageDialog(this, "Xeque-mate! As " + (tabuleiro.getTurno() == Cor.BRANCA ? "pretas" : "brancas") + " venceram!");
                 }
@@ -81,11 +102,46 @@ public class TabuleiroGUI extends JFrame {
             }
         }
     }
+
+    private void promoverPeao() {
+        Object[] options = {"Rainha", "Torre", "Bispo", "Cavalo"};
+        int n = JOptionPane.showOptionDialog(this,
+                "Escolha a peça para promover o peão:",
+                "Promoção de Peão",
+                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[0]);
+
+        Peca novaPeca = null;
+        Cor cor = tabuleiro.getPromocao().getCor();
+        switch (n) {
+            case 0:
+                novaPeca = new Rainha(cor);
+                break;
+            case 1:
+                novaPeca = new Torre(cor);
+                break;
+            case 2:
+                novaPeca = new Bispo(cor);
+                break;
+            case 3:
+                novaPeca = new Cavalo(cor);
+                break;
+            default:
+                novaPeca = new Rainha(cor);
+                break;
+        }
+        tabuleiro.promoverPeca(novaPeca);
+        atualizarTabuleiro();
+    }
+
      private void highlightMovimentos() {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 if (movimentosPossiveis[i][j]) {
-                    casas[i][j].setBackground(new Color(130, 151, 105));
+                    casas[i][j].setBorder(BorderFactory.createLineBorder(new Color(0, 255, 0), 3));
                 }
             }
         }
@@ -94,15 +150,20 @@ public class TabuleiroGUI extends JFrame {
     private void limparHighlights() {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                if ((i + j) % 2 == 0) {
-                    casas[i][j].setBackground(new Color(240, 217, 181));
-                } else {
-                    casas[i][j].setBackground(new Color(181, 136, 99));
-                }
+                casas[i][j].setBorder(null);
             }
         }
     }
 
+
+    private void reiniciarJogo() {
+        tabuleiro = new Tabuleiro();
+        pecaSelecionada = null;
+        movimentosPossiveis = null;
+        pecaNaPosicao = null;
+        limparHighlights();
+        atualizarTabuleiro();
+    }
 
     private void atualizarTabuleiro() {
         for (int i = 0; i < 8; i++) {
