@@ -1,0 +1,17 @@
+# Ignorar arquivos compilados (Classes Java)
+*.class
+bin/
+out/
+target/
+
+# Ignorar configurações locais do VS Code e IDEs (não devem subir)
+.vscode/
+.settings/
+.classpath
+.project
+*.iml
+.idea/
+
+# Arquivos de sistema operacional
+.DS_Store
+Thumbs.db

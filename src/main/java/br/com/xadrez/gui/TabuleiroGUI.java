@@ -10,7 +10,6 @@ import br.com.xadrez.modelo.Posicao;
 import br.com.xadrez.modelo.Rainha;
 import br.com.xadrez.modelo.Tabuleiro;
 import br.com.xadrez.modelo.Torre;
-import java.io.File;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -128,8 +127,7 @@ public class TabuleiroGUI extends JFrame {
     
     private void playSound() {
         try {
-            File soundFile = new File("Sfx/public_sound_lisp_Confirmation.wav");
-            AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundFile);
+            AudioInputStream audioIn = AudioSystem.getAudioInputStream(getClass().getResource("/Sfx/public_sound_lisp_Confirmation.wav"));
             Clip clip = AudioSystem.getClip();
             clip.open(audioIn);
             clip.start();
