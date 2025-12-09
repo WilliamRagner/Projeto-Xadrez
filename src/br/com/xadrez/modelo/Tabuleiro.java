@@ -225,7 +225,7 @@ public class Tabuleiro {
         }
         return false;
     }
-    private Peca fazerMovimentoTemporario(Posicao da, Posicao para) {
+    public Peca fazerMovimentoTemporario(Posicao da, Posicao para) {
         Peca peca = getPeca(da);
         Peca pecaCapturada = getPeca(para);
         casas[da.getLinha()][da.getColuna()] = null;
@@ -234,7 +234,7 @@ public class Tabuleiro {
         return pecaCapturada;
     }
 
-    private void desfazerMovimento(Posicao da, Posicao para, Peca pecaCapturada) {
+    public void desfazerMovimento(Posicao da, Posicao para, Peca pecaCapturada) {
         Peca peca = getPeca(para);
         casas[da.getLinha()][da.getColuna()] = peca;
         casas[para.getLinha()][para.getColuna()] = pecaCapturada;

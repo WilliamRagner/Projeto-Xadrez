@@ -66,4 +66,9 @@ public class Bispo extends Peca {
 
         return movimentos;
     }
+
+    @Override
+    public int getValor() {
+        return 3;
+    }
 }

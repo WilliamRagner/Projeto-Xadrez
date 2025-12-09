@@ -69,4 +69,9 @@ public class Peao extends Peca {
 
         return matrizMovimentos;
     }
+
+    @Override
+    public int getValor() {
+        return 1;
+    }
 }

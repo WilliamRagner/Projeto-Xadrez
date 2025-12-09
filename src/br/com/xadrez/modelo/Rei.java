@@ -68,4 +68,9 @@ public class Rei extends Peca {
 
         return movimentos;
     }
+
+    @Override
+    public int getValor() {
+        return 10000;
+    }
 }

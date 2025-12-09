@@ -110,4 +110,9 @@ public class Rainha extends Peca {
 
         return movimentos;
     }
+
+    @Override
+    public int getValor() {
+        return 9;
+    }
 }

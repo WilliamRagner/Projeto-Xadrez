@@ -70,4 +70,9 @@ public class Torre extends Peca {
 
         return movimentos;
     }
+
+    @Override
+    public int getValor() {
+        return 5;
+    }
 }
