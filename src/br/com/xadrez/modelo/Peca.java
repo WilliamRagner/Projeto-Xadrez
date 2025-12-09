@@ -34,4 +34,6 @@ public abstract class Peca {
     public abstract String getSimbolo();
     
     public abstract boolean[][] movimentosPossiveis();
+
+    public abstract int getValor();
 }

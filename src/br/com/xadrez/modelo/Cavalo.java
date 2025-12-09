@@ -32,4 +32,9 @@ public class Cavalo extends Peca {
 
         return movimentos;
     }
+
+    @Override
+    public int getValor() {
+        return 3;
+    }
 }

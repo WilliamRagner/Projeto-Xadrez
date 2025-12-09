@@ -2,12 +2,18 @@ package br.com.xadrez.gui;
 
 import br.com.xadrez.modelo.Bispo;
 import br.com.xadrez.modelo.Cavalo;
+import br.com.xadrez.modelo.Computador;
 import br.com.xadrez.modelo.Cor;
+import br.com.xadrez.modelo.Jogada;
 import br.com.xadrez.modelo.Peca;
 import br.com.xadrez.modelo.Posicao;
 import br.com.xadrez.modelo.Rainha;
 import br.com.xadrez.modelo.Tabuleiro;
 import br.com.xadrez.modelo.Torre;
+import java.io.File;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 import java.awt.*;
 
@@ -19,6 +25,11 @@ public class TabuleiroGUI extends JFrame {
     private Peca pecaSelecionada;
     private boolean[][] movimentosPossiveis;
     private Posicao pecaNaPosicao;
+
+
+    private boolean contraComputador = false;
+    private Cor corDoJogador = Cor.BRANCA;
+    private Cor corDoComputador = Cor.PRETA;
 
 
     public TabuleiroGUI() {
@@ -52,10 +63,13 @@ public class TabuleiroGUI extends JFrame {
         JMenuBar menuBar = new JMenuBar();
         JMenu menu = new JMenu("Jogo");
         JMenuItem reiniciar = new JMenuItem("Começar outra partida");
-        reiniciar.addActionListener(e -> reiniciarJogo());
+        reiniciar.addActionListener(e -> reiniciarJogo(false));
+        JMenuItem jogarContraComputador = new JMenuItem("Jogar contra Computador");
+        jogarContraComputador.addActionListener(e -> reiniciarJogo(true));
         JMenuItem sair = new JMenuItem("Sair do jogo");
         sair.addActionListener(e -> System.exit(0));
         menu.add(reiniciar);
+        menu.add(jogarContraComputador);
         menu.add(sair);
         menuBar.add(menu);
         setJMenuBar(menuBar);
@@ -69,6 +83,10 @@ public class TabuleiroGUI extends JFrame {
         setVisible(true);
     }
      private void onCasaClicked(int linha, int coluna) {
+        if (contraComputador && tabuleiro.getTurno() == corDoComputador) {
+            return; // Não é a vez do jogador
+        }
+
         if (pecaSelecionada == null) {
             Peca peca = tabuleiro.getPeca(linha, coluna);
             if (peca != null && peca.getCor() == tabuleiro.getTurno()) {
@@ -80,6 +98,7 @@ public class TabuleiroGUI extends JFrame {
         } else {
             if (movimentosPossiveis[linha][coluna]) {
                 tabuleiro.moverPeca(pecaNaPosicao, new Posicao(linha, coluna));
+                playSound();
                 pecaSelecionada = null;
                 movimentosPossiveis = null;
                 pecaNaPosicao = null;
@@ -92,6 +111,10 @@ public class TabuleiroGUI extends JFrame {
 
                 if (tabuleiro.estaEmXequeMate(tabuleiro.getTurno())) {
                     JOptionPane.showMessageDialog(this, "Xeque-mate! As " + (tabuleiro.getTurno() == Cor.BRANCA ? "pretas" : "brancas") + " venceram!");
+                } else {
+                    if (contraComputador) {
+                        fazerJogadaComputador();
+                    }
                 }
 
             } else {
@@ -100,6 +123,49 @@ public class TabuleiroGUI extends JFrame {
                 pecaNaPosicao = null;
                 limparHighlights();
             }
+        }
+    }
+    
+    private void playSound() {
+        try {
+            File soundFile = new File("Sfx/public_sound_lisp_Confirmation.wav");
+            AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundFile);
+            Clip clip = AudioSystem.getClip();
+            clip.open(audioIn);
+            clip.start();
+        } catch (Exception ex) {
+            // Não impede o jogo de continuar se o som falhar
+            System.err.println("Erro ao tocar o som: " + ex.getMessage());
+        }
+    }
+
+    private void fazerJogadaComputador() {
+        if (contraComputador && tabuleiro.getTurno() == corDoComputador) {
+            new SwingWorker<Jogada, Void>() {
+                @Override
+                protected Jogada doInBackground() throws Exception {
+                    // Adiciona um pequeno atraso para o jogador perceber a jogada
+                    Thread.sleep(500);
+                    return Computador.escolherMelhorJogada(tabuleiro, 2);
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        Jogada jogada = get();
+                        if (jogada != null) {
+                            tabuleiro.moverPeca(jogada.getDe(), jogada.getPara());
+                            playSound();
+                            atualizarTabuleiro();
+                            if (tabuleiro.estaEmXequeMate(tabuleiro.getTurno())) {
+                                JOptionPane.showMessageDialog(TabuleiroGUI.this, "Xeque-mate! As " + (tabuleiro.getTurno() == Cor.BRANCA ? "pretas" : "brancas") + " venceram!");
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }.execute();
         }
     }
 
@@ -156,13 +222,35 @@ public class TabuleiroGUI extends JFrame {
     }
 
 
-    private void reiniciarJogo() {
+    private void reiniciarJogo(boolean contraComputador) {
+        this.contraComputador = contraComputador;
         tabuleiro = new Tabuleiro();
         pecaSelecionada = null;
         movimentosPossiveis = null;
         pecaNaPosicao = null;
         limparHighlights();
-        atualizarTabuleiro();
+
+        if (contraComputador) {
+            Object[] options = {"Brancas", "Pretas"};
+            int n = JOptionPane.showOptionDialog(this,
+                    "Escolha sua cor:",
+                    "Escolha de Cor",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    options,
+                    options[0]);
+
+            corDoJogador = (n == JOptionPane.YES_OPTION) ? Cor.BRANCA : Cor.PRETA;
+            corDoComputador = (corDoJogador == Cor.BRANCA) ? Cor.PRETA : Cor.BRANCA;
+
+            atualizarTabuleiro();
+            if (corDoJogador == Cor.PRETA) {
+                fazerJogadaComputador();
+            }
+        } else {
+            atualizarTabuleiro();
+        }
     }
 
     private void atualizarTabuleiro() {
