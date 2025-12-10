@@ -22,3 +22,7 @@ Este é um projeto Maven. Para compilar e executar:
     java -jar target/xadrez-1.0.0.jar
     ```
     (Assumindo que o `Main-Class` está definido no `pom.xml` - o que não está no momento, mas é o próximo passo para um projeto maven)
+
+
+<img width="799" height="845" alt="image" src="https://github.com/user-attachments/assets/f183efa5-de39-4cd9-b329-0eaf7598d30b" />
+
