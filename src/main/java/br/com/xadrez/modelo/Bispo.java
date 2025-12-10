@@ -14,51 +14,42 @@ public class Bispo extends Peca {
     @Override
     public boolean[][] movimentosPossiveis() {
         boolean[][] movimentos = new boolean[getTabuleiro().getLinhas()][getTabuleiro().getColunas()];
-        Posicao p = new Posicao(0, 0);
-
+        
         // Noroeste
-        p.setLinha(posicao.getLinha() - 1);
-        p.setColuna(posicao.getColuna() - 1);
+        Posicao p = new Posicao(getPosicao().getLinha() - 1, getPosicao().getColuna() - 1);
         while (getTabuleiro().posicaoValida(p) && !getTabuleiro().temPeca(p)) {
             movimentos[p.getLinha()][p.getColuna()] = true;
-            p.setLinha(p.getLinha() - 1);
-            p.setColuna(p.getColuna() - 1);
+            p = new Posicao(p.getLinha() - 1, p.getColuna() - 1);
         }
         if (getTabuleiro().posicaoValida(p) && getTabuleiro().temPecaAdversaria(p, this)) {
             movimentos[p.getLinha()][p.getColuna()] = true;
         }
 
         // Nordeste
-        p.setLinha(posicao.getLinha() - 1);
-        p.setColuna(posicao.getColuna() + 1);
+        p = new Posicao(getPosicao().getLinha() - 1, getPosicao().getColuna() + 1);
         while (getTabuleiro().posicaoValida(p) && !getTabuleiro().temPeca(p)) {
             movimentos[p.getLinha()][p.getColuna()] = true;
-            p.setLinha(p.getLinha() - 1);
-            p.setColuna(p.getColuna() + 1);
+            p = new Posicao(p.getLinha() - 1, p.getColuna() + 1);
         }
         if (getTabuleiro().posicaoValida(p) && getTabuleiro().temPecaAdversaria(p, this)) {
             movimentos[p.getLinha()][p.getColuna()] = true;
         }
 
         // Sudoeste
-        p.setLinha(posicao.getLinha() + 1);
-        p.setColuna(posicao.getColuna() - 1);
+        p = new Posicao(getPosicao().getLinha() + 1, getPosicao().getColuna() - 1);
         while (getTabuleiro().posicaoValida(p) && !getTabuleiro().temPeca(p)) {
             movimentos[p.getLinha()][p.getColuna()] = true;
-            p.setLinha(p.getLinha() + 1);
-            p.setColuna(p.getColuna() - 1);
+            p = new Posicao(p.getLinha() + 1, p.getColuna() - 1);
         }
         if (getTabuleiro().posicaoValida(p) && getTabuleiro().temPecaAdversaria(p, this)) {
             movimentos[p.getLinha()][p.getColuna()] = true;
         }
 
         // Sudeste
-        p.setLinha(posicao.getLinha() + 1);
-        p.setColuna(posicao.getColuna() + 1);
+        p = new Posicao(getPosicao().getLinha() + 1, getPosicao().getColuna() + 1);
         while (getTabuleiro().posicaoValida(p) && !getTabuleiro().temPeca(p)) {
             movimentos[p.getLinha()][p.getColuna()] = true;
-            p.setLinha(p.getLinha() + 1);
-            p.setColuna(p.getColuna() + 1);
+            p = new Posicao(p.getLinha() + 1, p.getColuna() + 1);
         }
         if (getTabuleiro().posicaoValida(p) && getTabuleiro().temPecaAdversaria(p, this)) {
             movimentos[p.getLinha()][p.getColuna()] = true;

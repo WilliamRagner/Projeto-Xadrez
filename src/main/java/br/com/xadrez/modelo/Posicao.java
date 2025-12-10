@@ -1,8 +1,10 @@
 package br.com.xadrez.modelo;
 
+import java.util.Objects;
+
 public class Posicao {
-    private int linha;
-    private int coluna;
+    private final int linha;
+    private final int coluna;
 
     public Posicao(int linha, int coluna) {
         this.linha = linha;
@@ -13,16 +15,21 @@ public class Posicao {
         return linha;
     }
 
-    public void setLinha(int linha) {
-        this.linha = linha;
-    }
-
     public int getColuna() {
         return coluna;
     }
 
-    public void setColuna(int coluna) {
-        this.coluna = coluna;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Posicao posicao = (Posicao) o;
+        return linha == posicao.linha && coluna == posicao.coluna;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(linha, coluna);
     }
 
     @Override

@@ -127,26 +127,26 @@ public class TabuleiroGUI extends JFrame {
     }
     
     private void playSound() {
-        try {
-            java.net.URL soundURL = getClass().getResource("/Sfx/public_sound_lisp_Confirmation.wav");
-            if (soundURL == null) {
+        try (InputStream inputStream = getClass().getResourceAsStream("/Sfx/public_sound_lisp_Confirmation.wav")) {
+            if (inputStream == null) {
                 System.err.println("Recurso de áudio não encontrado: /Sfx/public_sound_lisp_Confirmation.wav");
                 return;
             }
-            AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundURL);
-            Clip clip = AudioSystem.getClip();
-            clip.addLineListener(event -> {
-                if (event.getType() == LineEvent.Type.STOP) {
-                    clip.close();
-                    try {
-                        audioIn.close();
-                    } catch (java.io.IOException e) {
-                        e.printStackTrace();
+            
+            InputStream bufferedIn = new java.io.BufferedInputStream(inputStream);
+            
+            try (AudioInputStream audioIn = AudioSystem.getAudioInputStream(bufferedIn)) {
+                Clip clip = AudioSystem.getClip();
+                
+                clip.addLineListener(event -> {
+                    if (event.getType() == LineEvent.Type.STOP) {
+                        clip.close();
                     }
-                }
-            });
-            clip.open(audioIn);
-            clip.start();
+                });
+                
+                clip.open(audioIn);
+                clip.start();
+            }
         } catch (Exception ex) {
             // Não impede o jogo de continuar se o som falhar
             System.err.println("Erro ao tocar o som: " + ex.getMessage());

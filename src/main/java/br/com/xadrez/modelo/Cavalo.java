@@ -14,7 +14,6 @@ public class Cavalo extends Peca {
     @Override
     public boolean[][] movimentosPossiveis() {
         boolean[][] movimentos = new boolean[getTabuleiro().getLinhas()][getTabuleiro().getColunas()];
-        Posicao p = new Posicao(0, 0);
 
         int[][] possiveisMovimentos = {
             {-2, -1}, {-2, 1}, {-1, -2}, {-1, 2},
@@ -22,8 +21,7 @@ public class Cavalo extends Peca {
         };
 
         for (int[] movimento : possiveisMovimentos) {
-            p.setLinha(posicao.getLinha() + movimento[0]);
-            p.setColuna(posicao.getColuna() + movimento[1]);
+            Posicao p = new Posicao(getPosicao().getLinha() + movimento[0], getPosicao().getColuna() + movimento[1]);
 
             if (getTabuleiro().posicaoValida(p) && (!getTabuleiro().temPeca(p) || getTabuleiro().temPecaAdversaria(p, this))) {
                 movimentos[p.getLinha()][p.getColuna()] = true;

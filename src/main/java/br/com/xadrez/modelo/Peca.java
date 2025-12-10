@@ -3,8 +3,8 @@ package br.com.xadrez.modelo;
 public abstract class Peca {
     
     private final Cor cor;
-    protected Posicao posicao;
-    protected Tabuleiro tabuleiro;
+    private Posicao posicao;
+    private Tabuleiro tabuleiro;
 
 
     public Peca(Cor cor) {
