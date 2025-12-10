@@ -13,6 +13,7 @@ import br.com.xadrez.modelo.Torre;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineEvent;
 import javax.swing.*;
 import java.awt.*;
 
@@ -127,13 +128,29 @@ public class TabuleiroGUI extends JFrame {
     
     private void playSound() {
         try {
-            AudioInputStream audioIn = AudioSystem.getAudioInputStream(getClass().getResource("/Sfx/public_sound_lisp_Confirmation.wav"));
+            java.net.URL soundURL = getClass().getResource("/Sfx/public_sound_lisp_Confirmation.wav");
+            if (soundURL == null) {
+                System.err.println("Recurso de áudio não encontrado: /Sfx/public_sound_lisp_Confirmation.wav");
+                return;
+            }
+            AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundURL);
             Clip clip = AudioSystem.getClip();
+            clip.addLineListener(event -> {
+                if (event.getType() == LineEvent.Type.STOP) {
+                    clip.close();
+                    try {
+                        audioIn.close();
+                    } catch (java.io.IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
             clip.open(audioIn);
             clip.start();
         } catch (Exception ex) {
             // Não impede o jogo de continuar se o som falhar
             System.err.println("Erro ao tocar o som: " + ex.getMessage());
+            ex.printStackTrace();
         }
     }
 
